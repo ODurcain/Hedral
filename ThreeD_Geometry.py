@@ -28,8 +28,9 @@ def bounding_box():
         points = np.array(points).astype(float).tolist()
         min_points, max_points=calc_bounding_box(points)
         return jsonify({'The bounding box is from min_point': min_points, 'to max_point': max_points}), 200
-    except KeyError:
-        return jsonify({'error': 'Invalid input format'}), 400
+    except KeyError as e:
+        invalid_parameter = str(e)
+        return jsonify({'error': f'Invalid input format: missing parameter "{invalid_parameter}"'}), 400
     
 # rotaion of a 3D mesh logic    
 def rotate_mesh_logic(mesh: List[Tuple[float,float,float]], 
@@ -94,21 +95,17 @@ def rotate_mesh_endpoint():
         rotated_mesh = rotate_mesh_logic(mesh, angle, axis)
         return jsonify({'rotated_mesh': rotated_mesh}), 200
     except KeyError:
-        return jsonify({'error': 'Invalid input format'}), 400
+        return jsonify({'error': 'Invalid Input Format'}), 400
 
 def move_mesh_logic(points: List[Tuple[float,float,float]], 
-                x: float, y: float, z: float) -> Tuple[Tuple[float,float,float], 
-                                                  Tuple[float,float,float]]:
-    #points = np.array(points).astype(float).tolist()
-
+                x: float, y: float, z: float) -> List[Tuple[float,float,float]]:
     moved_mesh=[]
     for point in points:
         moved_point=(point[0]+x, point[1]+y, point[2]+z)
         moved_mesh.append(moved_point)
-
     return moved_mesh
 
-
+# movement of a 3D mesh connection to a flaks
 @app.route('/move_mesh', methods=['POST'])
 def move_mesh_endpoint():
     try:
@@ -119,8 +116,9 @@ def move_mesh_endpoint():
         zDir=data['zDirection']
         moved_mesh=move_mesh_logic(mesh, xDir, yDir, zDir)
         return jsonify({'moved_mesh': moved_mesh}), 200
-    except KeyError:
-        return jsonify({'error': 'Invalid input format'}), 400
+    except KeyError as e:
+        invalid_parameter = str(e)
+        return jsonify({'error': f'Invalid input format: missing parameter "{invalid_parameter}"'}), 400
 
 # def is_convex(points: List[Tuple[float,float,float]]) -> bool:
 # @app.route('/is_convex', methods=['POST'])

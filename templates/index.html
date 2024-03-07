@@ -38,12 +38,14 @@
     <form id="moveMeshForm">
         <label for="moveMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="moveMesh" name="moveMesh" rows="4" cols="50"></textarea><br>
-        <label for="xMovement">X-Direction:</label>
-        <input type="number" id="xDirection" name="xDirection" required><br>
-        <label for="yMovement">Y-Direction:</label>
-        <input type="number" id="yDirection" name="yDirection" required><br>
-        <label for="zMovement">Z-Direction:</label>
-        <input type="number" id="zDirection" name="zDirection" required><br>
+        <label for="xDirection">X-Direction:</label>
+    <!-- I want to note that this probably isn't the best way as 
+        you have to adjust 'step' depending accuracy desired -->
+        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
+        <label for="yDirection">Y-Direction:</label>
+        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
+        <label for="xDirection">Z-Direction:</label>
+        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
         <button type="submit">Move</button>
     </form>
     <div id="moveMeshResult"></div>
@@ -91,7 +93,7 @@
             document.getElementById('boundingBoxResult').innerText = JSON.stringify(result);
         });
 
-        // Event listener for bounding box form submission
+        // Event listener for rotation form submission
         document.getElementById('rotateMeshForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const points = document.getElementById('rotateMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
@@ -101,10 +103,14 @@
             document.getElementById('rotateMeshResult').innerText = JSON.stringify(result);
         });
 
-        // Event listener for bounding box form submission
+        // Event listener for movement form submission
         document.getElementById('moveMeshForm').addEventListener('submit', async function (event) {
             event.preventDefault();
-            
+            const points = document.getElementById('moveMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
+            const xDir = parseFloat(document.getElementById('xDirection').value);
+            const yDir = parseFloat(document.getElementById('yDirection').value);
+            const zDir = parseFloat(document.getElementById('zDirection').value);
+            const result = await makeRequest('/move_mesh', 'POST', { points: points, xDirection: xDir, yDirection: yDir, zDirection: zDir });
             document.getElementById('moveMeshResult').innerText = JSON.stringify(result);
         });
 
