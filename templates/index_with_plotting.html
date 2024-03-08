@@ -14,6 +14,7 @@
         <button type="submit">Calculate</button>
     </form>
     <div id="boundingBoxResult"></div>
+    <div id="boundingBoxPlot"></div>
 
     <h2>Rotate Mesh</h2>
     <form id="rotateMeshForm">
@@ -33,6 +34,7 @@
         <button type="submit">Rotate</button>
     </form>
     <div id="rotateMeshResult"></div>
+    <div id="rotateMeshPlot"></div>
 
     <h2>Move Mesh</h2>
     <form id="moveMeshForm">
@@ -49,6 +51,7 @@
         <button type="submit">Move</button>
     </form>
     <div id="moveMeshResult"></div>
+    <div id="movMeshPlot"></div>
 
     <h2>Is it Convex?</h2>
     <form id="isConvexForm">
@@ -85,12 +88,22 @@
             }
         }
 
+        // Function to display plots
+        function displayPlot(containerId, plotData) {
+            const plotContainer = document.getElementById(containerId);
+            plotContainer.innerHTML = ''; // Clear previous content
+            const img = new Image();
+            img.src = `data:image/png;base64,${plotData}`;
+            plotContainer.appendChild(img);
+        }
+
         // Event listener for bounding box form submission
         document.getElementById('boundingBoxForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const points = document.getElementById('points').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
             const result = await makeRequest('/bounding_box', 'POST', { points: points });
             document.getElementById('boundingBoxResult').innerText = JSON.stringify(result);
+            displayPlot('boundingBoxPlot', result.plot);
         });
 
         // Event listener for rotation form submission
@@ -101,6 +114,7 @@
             const axis = document.getElementById('axis').value;
             const result = await makeRequest('/rotate_mesh', 'POST', { points: points, angle: angle, axis: axis });
             document.getElementById('rotateMeshResult').innerText = JSON.stringify(result);
+            displayPlot('rotateMeshPlot', result.plot);
         });
 
         // Event listener for movement form submission
@@ -112,6 +126,7 @@
             const zDir = parseFloat(document.getElementById('zDirection').value);
             const result = await makeRequest('/move_mesh', 'POST', { points: points, xDirection: xDir, yDirection: yDir, zDirection: zDir });
             document.getElementById('moveMeshResult').innerText = JSON.stringify(result);
+            displayPlot('moveMeshPlot', result.plot);
         });
 
         // Event listener for is convex? form submission

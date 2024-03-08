@@ -6,6 +6,8 @@ import numpy as np
 from typing import List, Tuple
 # for rotation. may import all of math for scalar stuff
 from math import cos, sin, radians, sqrt, pi, acos
+# specifically for plotting 
+import matplotlib.pyplot as plt
 
 app=Flask(__name__)
 
@@ -13,6 +15,26 @@ app=Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+def plot_points(points, title):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points], c='b', marker='o')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title(title)
+    plt.show()
+
+def plot_mesh(mesh, title):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_trisurf([p[0] for p in mesh], [p[1] for p in mesh], [p[2] for p in mesh], cmap='viridis', edgecolor='none')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title(title)
+    plt.show()
 
 # smallest box logic
 def calc_bounding_box(points: List[Tuple[float,float,float]]) -> Tuple[Tuple[float,float,float], Tuple[float,float,float]]:
@@ -27,6 +49,8 @@ def bounding_box():
         points = request.json['points']
         points = np.array(points).astype(float).tolist()
         min_points, max_points=calc_bounding_box(points)
+        plot_points(points, 'Original Points')
+        plot_points([min_points, max_points], 'Bounding Box')
         return jsonify({'The bounding box is from min_point': min_points, 'to max_point': max_points}), 200
     except KeyError as e:
         invalid_parameter = str(e)
