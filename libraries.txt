@@ -1,0 +1,5 @@
+Flask
+Flask-sqlalchemy
+matplotlib
+scipy
+numpy
