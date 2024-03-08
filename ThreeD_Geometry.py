@@ -1,4 +1,5 @@
-##
+## Geometric Functions Calculator
+## Created 3/7/2024
 
 from flask import Flask, request, jsonify, render_template
 import numpy as np
@@ -16,6 +17,8 @@ def index():
 
 # smallest box logic
 def calc_bounding_box(points: List[Tuple[float,float,float]]) -> Tuple[Tuple[float,float,float], Tuple[float,float,float]]:
+    if not points:
+        return None, None
     min_points = np.min(points, axis=0)
     max_points = np.max(points, axis=0)
     return tuple(min_points), tuple(max_points)
@@ -36,6 +39,8 @@ def bounding_box():
 def rotate_mesh_logic(mesh: List[Tuple[float,float,float]], 
                 angle: float, axis: str) -> Tuple[Tuple[float,float,float], 
                                                   Tuple[float,float,float]]:
+    if not mesh:
+        return None
     # converting to raidians
     angle_radians = radians(angle)
 
@@ -71,7 +76,7 @@ def rotate_mesh_logic(mesh: List[Tuple[float,float,float]],
     elif axis=='XZ':
         rotation_matrix=np.dot(x_rotation_matrix, z_rotation_matrix)
 
-    elif axis=='XY':
+    elif axis=='YZ':
         rotation_matrix=np.dot(y_rotation_matrix, z_rotation_matrix)
 
     else:
@@ -99,6 +104,8 @@ def rotate_mesh_endpoint():
 
 def move_mesh_logic(points: List[Tuple[float,float,float]], 
                 x: float, y: float, z: float) -> List[Tuple[float,float,float]]:
+    if not points:
+        return None
     moved_mesh=[]
     for point in points:
         moved_point=(point[0]+x, point[1]+y, point[2]+z)
@@ -154,6 +161,8 @@ def graham_scan(points: List[Tuple[float, float, float]]) -> List[Tuple[float, f
     return stack
 
 def is_convex_logic(points: List[Tuple[float, float, float]]) -> bool:
+    if not points:
+        return None
     convex_hull = graham_scan(points)
     
     # check if the number of points in the convex hull is equal to the number of points in the original polygon
