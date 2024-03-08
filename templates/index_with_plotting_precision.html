@@ -7,6 +7,14 @@
 {% block body %}
 <h1>Geometric Calculator</h1>
 
+    <h2>Set precision</h2>
+    <form id="setPrecision">
+        <label for="precision">Prescision (integer) sets the number of significant figures:</label><br>
+        <input type="number" id="precision" name="precision" min="0" required><br>
+        <button type="submit">Set Precision</button>
+    </form>
+    <div id="setPrecisionValue"></div>
+
     <h2>Calculate Smallest Bounding Box</h2>
     <form id="boundingBoxForm">
         <label for="points">3D Points (comma separated x,y,z):</label><br>
@@ -21,7 +29,7 @@
         <label for="rotateMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="rotateMesh" name="rotateMesh" rows="4" cols="50"></textarea><br>
         <label for="angle">Angle (x.xx):</label>
-        <input type="number" id="angle" name="angle" min="0" step="0.01" requried><br>
+        <input type="number" id="angle" name="angle" min="0" step="{{ precision }}" requried><br>
         <label for="axis">Axis:</label>
         <select id="axis" name="axis" required>
             <option value="X">X</option>
@@ -43,11 +51,11 @@
         <label for="xDirection">X-Direction (x.xx):</label>
     <!-- I want to note that this probably isn't the best way as 
         you have to adjust 'step' depending accuracy desired -->
-        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
+        <input type="number" id="xDirection" name="xDirection" step="{{ precision }}" required><br>
         <label for="yDirection">Y-Direction (x.xx):</label>
-        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
+        <input type="number" id="yDirection" name="yDirection" step="{{ precision }}" required><br>
         <label for="xDirection">Z-Direction (x.xx):</label>
-        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
+        <input type="number" id="zDirection" name="zDirection" step="{{ precision }}" required><br>
         <button type="submit">Move</button>
     </form>
     <div id="moveMeshResult"></div>
@@ -88,6 +96,7 @@
             }
         }
 
+        
         // Function to display plots
         function displayPlot(containerId, plotData) {
             const plotContainer = document.getElementById(containerId);
@@ -96,6 +105,28 @@
             img.src = `data:image/png;base64,${plotData}`;
             plotContainer.appendChild(img);
         }
+
+        // Event handler for precision
+        document.getElementById('setPrecision').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Get the precision value from the input
+            const precisionInput = document.getElementById('precisionInput');
+            const precisionValue = parseInt(precisionInput.value);
+            
+            // Calculate the step value based on the precision
+            let stepValue = '0.';
+            for (let i = 0; i < precisionValue; i++) {
+                stepValue += '0';
+            }
+            stepValue += '1';
+            
+            // Set the step attribute of all elements with the class 'adjustable-step'
+            const elements = document.querySelectorAll('.adjustable-step');
+            elements.forEach(element => {
+                element.setAttribute('step', stepValue);
+            });
+        });
 
         // Event listener for bounding box form submission
         document.getElementById('boundingBoxForm').addEventListener('submit', async function (event) {
