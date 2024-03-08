@@ -121,6 +121,8 @@ python3 3D_Geometry_Testing.py
 * I accidentally lost the Gift wrapping algorithm code, so maybe it wasn’t meant to be. 
 * When doing dual axis rotation there are different order in which you can rotate the axis and I used an online calculator to figure out the order in which python chooses to do it. It has a tendency to go Z > Y > X as I found through testing.
 * Move mesh and bounding box were straightforward with NumPy library and basic arithmetic operations.
+* `ThreeD_geometry_with_Plotting.py` can be disregarded. It does work and will output a 3D plot with points, but it's not where I want it to be. It also has the beginnings of scalar, shear, reflection, and rotate/move simultaneously.
+* `index_with_plotting_precision.html` can also be disregarded for the time being. This handles the aforementioned plotting and also has the beginnings of adjustable precision (I made the assumption it was referencing significant figures).
 
 (Admin level. Jump to run for relevant information)
 Setup Steps:
