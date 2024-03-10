@@ -2,8 +2,14 @@ version: '3.8'
 
 services:
   web:
+    build: .
     expose:
       - "5000"
-    build: .
     ports:
       - "5000:5000"
+    network_mode: "host"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      - FLASK_APP=ThreeD_Geometry.py
+      - FLASK_RUN_HOST=0.0.0.0

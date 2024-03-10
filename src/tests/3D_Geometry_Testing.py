@@ -38,14 +38,14 @@ class TestBoundingBox(unittest.TestCase):
         self.assertEqual(max_point, (7, 8, 9))
 
     def test_calc_bounding_box_with_float_values(self):
-        # Test with floating-point values
+        # Test with float values
         points = [(1.5, 2.5, 3.5), (4.75, 5.25, 6.75), (7.125, 8.625, 9.875)]
         min_point, max_point = calc_bounding_box(points)
         self.assertEqual(min_point, (1.5, 2.5, 3.5))
         self.assertEqual(max_point, (7.125, 8.625, 9.875))
 
     def test_calc_bounding_box_with_mixed_values(self):
-        # Test with mixed integer and floating-point values
+        # Test with mixed integer and float values
         points = [(1, 2, 3), (4.75, 5.25, 6.75), (-7, -8, -9)]
         min_point, max_point = calc_bounding_box(points)
         self.assertEqual(min_point, (-7, -8, -9))
@@ -176,7 +176,7 @@ class TestMoveMesh(unittest.TestCase):
         self.assertEqual(moved_mesh, expected_moved_mesh)
 
     def test_move_mesh_with_float_values(self):
-        # Test moving a mesh with floating-point values
+        # Test moving a mesh with float values
         mesh = [(1.5, 2.5, 3.5), (4.75, 5.25, 6.75), (7.125, 8.625, 9.875)]
         moved_mesh = move_mesh_logic(mesh, 1.5, 2.5, 3.5)
         expected_moved_mesh = [(3.0, 5.0, 7.0), (6.25, 7.75, 10.25), (8.625, 11.125, 13.375)]
@@ -185,7 +185,7 @@ class TestMoveMesh(unittest.TestCase):
                 self.assertAlmostEqual(moved_mesh[i][j], expected_moved_mesh[i][j], delta=0.0001)
 
     def test_move_mesh_with_mixed_values(self):
-        # Test moving a mesh with mixed integer and floating-point values
+        # Test moving a mesh with mixed integer and float values
         mesh = [(1, 2, 3), (4.75, 5.25, 6.75), (-7, -8, -9)]
         moved_mesh = move_mesh_logic(mesh, 1.5, -2.5, 3)
         expected_moved_mesh = [(2.5, -0.5, 6), (6.25, 2.75, 9.75), (-5.5, -10.5, -6)]
