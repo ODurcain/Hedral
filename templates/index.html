@@ -58,6 +58,53 @@
     </form>
     <div id="isConvexResult"></div>
 
+    <h2>Scalar</h2>
+    <form id="scaleMeshForm">
+        <label for="scaleMesh">Mesh (comma separated x,y,z):</label><br>
+        <textarea id="scaleMesh" name="scaleMesh" rows="4" cols="50"></textarea><br>
+        <label for="xDirection">X-Direction (x.xx):</label>
+        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
+        <label for="yDirection">Y-Direction (x.xx):</label>
+        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
+        <label for="xDirection">Z-Direction (x.xx):</label>
+        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
+        <button type="submit">Scale</button>
+    </form>
+    <div id="scaleMeshResult"></div>
+
+    <!-- /https://www.geeksforgeeks.org/computer-graphics-reflection-transformation-in-3d/ -->
+    <h2>Reflection</h2>
+    <form id="reflectMeshForm">
+        <label for="reflectMesh">Mesh (comma separated x,y,z):</label><br>
+        <textarea id="reflectMesh" name="reflectMesh" rows="4" cols="50"></textarea><br>
+        <label for="xDirection">Reflect on axis:</label>
+        <label for="axis">Axis:</label>
+        <select id="axis" name="axis" required>
+            <option value="XY">XY</option>
+            <option value="XZ">XZ</option>
+            <option value="YZ">YZ</option>
+        </select><br>
+        <button type="submit">Scale</button>
+    </form>
+    <div id="reflectMeshResult"></div>
+
+    <!-- https://www.geeksforgeeks.org/computer-graphics-3d-shearing-transformation/ -->
+    <h2>Shear</h2>
+    <form id="shearMeshForm">
+        <label for="shearMesh">Mesh (comma separated x,y,z):</label><br>
+        <textarea id="shearMesh" name="shearMesh" rows="4" cols="50"></textarea><br>
+        <label for="xDirection">X-Direction (x.xx):</label>
+        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
+        <label for="yDirection">Y-Direction (x.xx):</label>
+        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
+        <label for="xDirection">Z-Direction (x.xx):</label>
+        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
+        <button type="submit">Scale</button>
+    </form>
+    <div id="shearMeshResult"></div>
+
+    <h2>Rotate/Move Simultaneously! Also maybe</h2>
+
     <script>
         // Function to make API requests
         async function makeRequest(url, method, body = {}) {
@@ -112,6 +159,37 @@
             const points = document.getElementById('convex').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
             const result = await makeRequest('/is_convex', 'POST', { points: points });
             document.getElementById('isConvexResult').innerText = JSON.stringify(result);
+        });
+
+        // Event listener for scale form submission
+        document.getElementById('scaleMeshForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const points = document.getElementById('scaleMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
+            const xDir = parseFloat(document.getElementById('xDirection').value);
+            const yDir = parseFloat(document.getElementById('yDirection').value);
+            const zDir = parseFloat(document.getElementById('zDirection').value);
+            const result = await makeRequest('/scale_mesh', 'POST', { points: points, axis: axis });
+            document.getElementById('scaleMeshResult').innerText = JSON.stringify(result);
+        });
+
+        // Event listener for reflection form submission
+        document.getElementById('reflectForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const points = document.getElementById('reflectForm').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
+            const axis = document.getElementById('axis').value;
+            const result = await makeRequest('/reflect_mesh', 'POST', { points: points, axis: axis });
+            document.getElementById('reflectMeshResult').innerText = JSON.stringify(result);
+        });
+
+        // Event listener for scale form submission
+        document.getElementById('shearMeshForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const points = document.getElementById('shearMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
+            const xDir = parseFloat(document.getElementById('xDirection').value);
+            const yDir = parseFloat(document.getElementById('yDirection').value);
+            const zDir = parseFloat(document.getElementById('zDirection').value);
+            const result = await makeRequest('/shear_mesh', 'POST', { points: points, xDirection: xDir, yDirection: yDir, zDirection: zDir });
+            document.getElementById('shearMeshResult').innerText = JSON.stringify(result);
         });
 
     </script>
