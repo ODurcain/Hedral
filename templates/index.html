@@ -38,14 +38,14 @@
     <form id="moveMeshForm">
         <label for="moveMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="moveMesh" name="moveMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirection">X-Direction (x.xx):</label>
+        <label for="xDirectionMove">X-Direction (x.xx):</label>
     <!-- I want to note that this probably isn't the best way as 
         you have to adjust 'step' depending accuracy desired -->
-        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
-        <label for="yDirection">Y-Direction (x.xx):</label>
-        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
-        <label for="xDirection">Z-Direction (x.xx):</label>
-        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
+        <input type="number" id="xDirectionMove" name="xDirectionMove" step="0.01" required><br>
+        <label for="yDirectionMove">Y-Direction (x.xx):</label>
+        <input type="number" id="yDirectionMove" name="yDirectionMove" step="0.01" required><br>
+        <label for="xDirectionMove">Z-Direction (x.xx):</label>
+        <input type="number" id="zDirectionMove" name="zDirectionMove" step="0.01" required><br>
         <button type="submit">Move</button>
     </form>
     <div id="moveMeshResult"></div>
@@ -58,16 +58,17 @@
     </form>
     <div id="isConvexResult"></div>
 
+    <!-- https://www.geeksforgeeks.org/computer-graphics-3d-scaling-transformation/ -->
     <h2>Scalar</h2>
     <form id="scaleMeshForm">
         <label for="scaleMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="scaleMesh" name="scaleMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirection">X-Direction (x.xx):</label>
-        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
-        <label for="yDirection">Y-Direction (x.xx):</label>
-        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
-        <label for="xDirection">Z-Direction (x.xx):</label>
-        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
+        <label for="xDirectionScale">X-Direction (x.xx):</label>
+        <input type="number" id="xDirectionScale" name="xDirectionScale" step="0.01" required><br>
+        <label for="yDirectionScale">Y-Direction (x.xx):</label>
+        <input type="number" id="yDirectionScale" name="yDirectionScale" step="0.01" required><br>
+        <label for="xDirectionScale">Z-Direction (x.xx):</label>
+        <input type="number" id="zDirectionScale" name="zDirectionScale" step="0.01" required><br>
         <button type="submit">Scale</button>
     </form>
     <div id="scaleMeshResult"></div>
@@ -77,33 +78,41 @@
     <form id="reflectMeshForm">
         <label for="reflectMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="reflectMesh" name="reflectMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirection">Reflect on axis:</label>
-        <label for="axis">Axis:</label>
-        <select id="axis" name="axis" required>
+        <label for="axisReflect">Reflect on axis:</label>
+        <select id="axisReflect" name="axisReflect" required>
             <option value="XY">XY</option>
             <option value="XZ">XZ</option>
             <option value="YZ">YZ</option>
         </select><br>
-        <button type="submit">Scale</button>
+        <button type="submit">Reflect</button>
     </form>
-    <div id="reflectMeshResult"></div>
+    <div id="reflectMeshResult"></div>    
 
     <!-- https://www.geeksforgeeks.org/computer-graphics-3d-shearing-transformation/ -->
     <h2>Shear</h2>
     <form id="shearMeshForm">
         <label for="shearMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="shearMesh" name="shearMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirection">X-Direction (x.xx):</label>
-        <input type="number" id="xDirection" name="xDirection" step="0.01" required><br>
-        <label for="yDirection">Y-Direction (x.xx):</label>
-        <input type="number" id="yDirection" name="yDirection" step="0.01" required><br>
-        <label for="xDirection">Z-Direction (x.xx):</label>
-        <input type="number" id="zDirection" name="zDirection" step="0.01" required><br>
-        <button type="submit">Scale</button>
+        <label for="xDirectionShear">X-Direction (x.xx):</label>
+        <input type="number" id="xDirectionShear" name="xDirectionShear" step="0.01" required><br>
+        <label for="yDirectionShear">Y-Direction (x.xx):</label>
+        <input type="number" id="yDirectionShear" name="yDirectionShear" step="0.01" required><br>
+        <label for="zDirectionShear">Z-Direction (x.xx):</label>
+        <input type="number" id="zDirectionShear" name="zDirectionShear" step="0.01" required><br>
+        <label for="axisShear">Axis:</label>
+        <select id="axisShear" name="axisShear" required>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+            <option value="XY">XY</option>
+            <option value="XZ">XZ</option>
+            <option value="YZ">YZ</option>
+        </select><br>
+        <button type="submit">Shear</button>
     </form>
     <div id="shearMeshResult"></div>
 
-    <h2>Rotate/Move Simultaneously! Also maybe</h2>
+    <h2>Rotate/Move Simultaneously! Maybe maybe</h2>
 
     <script>
         // Function to make API requests
@@ -146,10 +155,10 @@
         document.getElementById('moveMeshForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const points = document.getElementById('moveMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
-            const xDir = parseFloat(document.getElementById('xDirection').value);
-            const yDir = parseFloat(document.getElementById('yDirection').value);
-            const zDir = parseFloat(document.getElementById('zDirection').value);
-            const result = await makeRequest('/move_mesh', 'POST', { points: points, xDirection: xDir, yDirection: yDir, zDirection: zDir });
+            const xDir = parseFloat(document.getElementById('xDirectionMove').value);
+            const yDir = parseFloat(document.getElementById('yDirectionMove').value);
+            const zDir = parseFloat(document.getElementById('zDirectionMove').value);
+            const result = await makeRequest('/move_mesh', 'POST', { points: points, xDirectionMove: xDir, yDirectionMove: yDir, zDirectionMove: zDir });
             document.getElementById('moveMeshResult').innerText = JSON.stringify(result);
         });
 
@@ -165,30 +174,31 @@
         document.getElementById('scaleMeshForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const points = document.getElementById('scaleMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
-            const xDir = parseFloat(document.getElementById('xDirection').value);
-            const yDir = parseFloat(document.getElementById('yDirection').value);
-            const zDir = parseFloat(document.getElementById('zDirection').value);
-            const result = await makeRequest('/scale_mesh', 'POST', { points: points, axis: axis });
+            const xDir = parseFloat(document.getElementById('xDirectionScale').value);
+            const yDir = parseFloat(document.getElementById('yDirectionScale').value);
+            const zDir = parseFloat(document.getElementById('zDirectionScale').value);
+            const result = await makeRequest('/scale_mesh', 'POST', { points: points, xDirectionScale: xDir, yDirectionScale: yDir, zDirectionScale: zDir });
             document.getElementById('scaleMeshResult').innerText = JSON.stringify(result);
         });
 
         // Event listener for reflection form submission
-        document.getElementById('reflectForm').addEventListener('submit', async function (event) {
+        document.getElementById('reflectMeshForm').addEventListener('submit', async function (event) {
             event.preventDefault();
-            const points = document.getElementById('reflectForm').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
-            const axis = document.getElementById('axis').value;
-            const result = await makeRequest('/reflect_mesh', 'POST', { points: points, axis: axis });
+            const points = document.getElementById('reflectMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
+            const axisReflect = document.getElementById('axisReflect').value;
+            const result = await makeRequest('/reflect_mesh', 'POST', { points: points, axisReflect: axisReflect });
             document.getElementById('reflectMeshResult').innerText = JSON.stringify(result);
         });
 
-        // Event listener for scale form submission
+        // Event listener for shear form submission
         document.getElementById('shearMeshForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const points = document.getElementById('shearMesh').value.trim().split('\n').map(line => line.split(',').map(parseFloat));
-            const xDir = parseFloat(document.getElementById('xDirection').value);
-            const yDir = parseFloat(document.getElementById('yDirection').value);
-            const zDir = parseFloat(document.getElementById('zDirection').value);
-            const result = await makeRequest('/shear_mesh', 'POST', { points: points, xDirection: xDir, yDirection: yDir, zDirection: zDir });
+            const xDir = parseFloat(document.getElementById('xDirectionShear').value);
+            const yDir = parseFloat(document.getElementById('yDirectionShear').value);
+            const zDir = parseFloat(document.getElementById('zDirectionShear').value);
+            const axisShear = document.getElementById('axisShear').value;
+            const result = await makeRequest('/shear_mesh', 'POST', { points: points, xDirectionShear: xDir, yDirectionShear: yDir, zDirectionShear: zDir, axisShear: axisShear });
             document.getElementById('shearMeshResult').innerText = JSON.stringify(result);
         });
 

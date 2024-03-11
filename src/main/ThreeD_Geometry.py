@@ -8,7 +8,7 @@ from typing import List, Tuple
 # for rotation. may import all of math for scalar stuff
 from math import cos, sin, radians, sqrt, pi, acos
 
-app=Flask(__name__)
+app=Flask(__name__, template_folder='../../templates')
 
 # I didn't know this was a hard requirement for Flask and I was stuck for an hour with a 404 error
 @app.route('/')
@@ -118,9 +118,9 @@ def move_mesh_endpoint():
     try:
         data=request.get_json()
         mesh=data['points']
-        xDir=data['xDirection']
-        yDir=data['yDirection']
-        zDir=data['zDirection']
+        xDir=data['xDirectionMove']
+        yDir=data['yDirectionMove']
+        zDir=data['zDirectionMove']
         moved_mesh=move_mesh_logic(mesh, xDir, yDir, zDir)
         return jsonify({'moved_mesh': moved_mesh}), 200
     except KeyError as e:
@@ -161,6 +161,7 @@ def graham_scan(points: List[Tuple[float, float, float]]) -> List[Tuple[float, f
     return stack
 
 def is_convex_logic(points: List[Tuple[float, float, float]]) -> bool:
+
     if not points:
         return None
     convex_hull = graham_scan(points)
@@ -177,6 +178,145 @@ def is_convex():
         return jsonify({'convex': convex}), 200
     except KeyError:
         return jsonify({'error': 'Invalid input format'}), 400
+
+def scale_mesh_logic(points: List[Tuple[float,float,float]], 
+                     x: float, y: float, z: float) -> List[Tuple[float,float,float]]:
+    if not points or x is None or y is None or z is None:
+        return None
+    
+    # going to update later for precision. will most likely be a global variable
+    epsilon=0.0001
+
+    x= 1 if abs(x) < epsilon else x
+    y= 1 if abs(y) < epsilon else y
+    z= 1 if abs(z) < epsilon else z
+    
+    scaled_mesh = []
+    for point in points:
+        scaled_point = (point[0] * (x if point[0]==max(p[0] for p in points) else 1),
+                        point[1] * (y if point[0]==max(p[1] for p in points) else 1), 
+                        point[2] * (z if point[0]==max(p[2] for p in points) else 1))
+        scaled_mesh.append(scaled_point)
+    
+    return scaled_mesh
+
+# scaling of a 3D mesh connection to a flaks
+@app.route('/scale_mesh', methods=['POST'])
+def scale_mesh_endpoint():
+    try:
+        data=request.get_json()
+        mesh=data['points']
+        xDir=data['xDirectionScale']
+        yDir=data['yDirectionScale']
+        zDir=data['zDirectionScale']
+        scaled_mesh=scale_mesh_logic(mesh, xDir, yDir, zDir)
+        return jsonify({'scaled_mesh': scaled_mesh}), 200
+    except KeyError as e:
+        invalid_parameter = str(e)
+        return jsonify({'error': f'Invalid input format: missing parameter "{invalid_parameter}"'}), 400
+    
+def reflect_mesh_logic(points: List[Tuple[float,float,float]], 
+                       axisReflect: str) -> List[Tuple[float,float,float]]:
+    if not points:
+        return None
+    
+    xy_reflect_matrix = np.array([[1,0,0],
+                                   [0,1,0],
+                                   [0,0,-1]])
+    xz_reflect_matrix = np.array([[1,0,0],
+                                   [0,-1,0],
+                                   [0,0,1]])
+    yz_reflect_matrix = np.array([[-1,0,0],
+                                   [0,1,0],
+                                   [0,0,1]])
+    
+    if axisReflect == 'XY':
+        reflect_matrix = xy_reflect_matrix
+    elif axisReflect == 'XZ':
+        reflect_matrix = xz_reflect_matrix
+    elif axisReflect == 'YZ':
+        reflect_matrix = yz_reflect_matrix
+    else:
+        raise ValueError("Invalid axis. Must be XY, XZ, or YZ")
+    
+    reflected_matrix = []
+    for point in points:
+        transformed_point = np.dot(reflect_matrix, point) 
+        reflected_matrix.append(tuple(transformed_point.tolist()))
+
+    return reflected_matrix
+
+@app.route('/reflect_mesh', methods=['POST'])
+def reflect_mesh_endpoint():
+    try:
+        data=request.get_json()
+        mesh=data['points']
+        axisReflect=data['axisReflect']
+        reflected_mesh=reflect_mesh_logic(mesh, axisReflect)
+        return jsonify({'reflected_mesh': reflected_mesh}), 200
+    except KeyError as e:
+        invalid_parameter = str(e)
+        return jsonify({'error': f'Invalid input format: missing parameter "{invalid_parameter}"'}), 400
+
+def shear_mesh_logic(points: List[Tuple[float,float,float]], 
+                x: float, y: float, z: float, axisShear: str) -> List[Tuple[float,float,float]]:
+    if not points:
+        return None
+    
+    x_shear_matrix=np.array([[1,y,z],
+                              [0,1,0],
+                              [0,0,1]])
+    y_shear_matrix=np.array([[1,0,0],
+                              [x,1,z],
+                              [0,0,1]])
+    z_shear_matrix=np.array([[1,0,x],
+                              [0,1,y],
+                              [0,0,1]])
+    
+    if axisShear =='X':
+        shear_matrix=x_shear_matrix
+
+    elif axisShear == 'Y':
+        shear_matrix=y_shear_matrix
+
+    elif axisShear == 'Z':
+        shear_matrix=z_shear_matrix
+
+    # 2 directional shear
+    elif axisShear=='XY':
+        shear_matrix=np.dot(x_shear_matrix, y_shear_matrix)
+
+    elif axisShear=='XZ':
+        shear_matrix=np.dot(x_shear_matrix, z_shear_matrix)
+
+    elif axisShear=='YZ':
+        shear_matrix=np.dot(y_shear_matrix, z_shear_matrix)
+
+    else:
+        raise ValueError("Invalid. must be X, Y, Z, XY, XZ, or YZ")
+    
+    sheared_mesh=[]
+    for point in points:
+        transformed_point = np.dot(shear_matrix, point)
+        sheared_mesh.append(transformed_point.tolist())
+
+    return sheared_mesh
+
+# movement of a 3D mesh connection to a flaks
+@app.route('/shear_mesh', methods=['POST'])
+def shear_mesh_endpoint():
+    try:
+        data=request.get_json()
+        mesh=data['points']
+        xDir=float(data['xDirectionShear'])
+        yDir=float(data['yDirectionShear'])
+        zDir=float(data['zDirectionShear'])
+        axisShear=data['axisShear']
+        sheared_mesh=shear_mesh_logic(mesh, xDir, yDir, zDir, axisShear)
+        return jsonify({'sheared_mesh': sheared_mesh}), 200
+    except KeyError as e:
+        invalid_parameter = str(e)
+        return jsonify({'error': f'Invalid input format: missing parameter "{invalid_parameter}"'}), 400
 
 if __name__=="__main__":
     app.run(debug=True)

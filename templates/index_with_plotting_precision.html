@@ -107,25 +107,36 @@
         }
 
         // Event handler for precision
-        document.getElementById('setPrecision').addEventListener('submit', function(event) {
+        document.getElementById('setPrecision').addEventListener('submit', async function(event) {
             event.preventDefault();
             
             // Get the precision value from the input
-            const precisionInput = document.getElementById('precisionInput');
+            const precisionInput = document.getElementById('precision');
             const precisionValue = parseInt(precisionInput.value);
             
-            // Calculate the step value based on the precision
-            let stepValue = '0.';
-            for (let i = 0; i < precisionValue; i++) {
-                stepValue += '0';
-            }
-            stepValue += '1';
+            // Make a request to the Flask endpoint to calculate step value
+            const response = await fetch('/set_precision', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ precision: precisionValue })
+            });
+
+            // Parse the response
+            const data = await response.json();
+            const stepValue = data.step_value;
+            const message = data.message;
             
             // Set the step attribute of all elements with the class 'adjustable-step'
             const elements = document.querySelectorAll('.adjustable-step');
             elements.forEach(element => {
                 element.setAttribute('step', stepValue);
             });
+
+            // Update the message displayed on the browser
+            const messageContainer = document.getElementById('precisionMessage');
+            messageContainer.textContent = message;
         });
 
         // Event listener for bounding box form submission

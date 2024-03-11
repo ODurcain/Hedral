@@ -16,6 +16,22 @@ app=Flask(__name__)
 def index():
     return render_template('index.html')
 
+def calc_precision(precision_value: int) -> str:
+    if precision_value <= 0:
+        return '1'
+    else:
+        return '0.'+'0'*(precision_value -1)+'1'
+
+@app.route('/set_precision', methods=['POST'])
+def set_precision():
+    try:
+        data=request.get_json()
+        precision_value=int(data['precision'])
+        sig_figures=calc_precision(precision_value)
+        return jsonify({'sig_figures': sig_figures}), 200
+    except KeyError:
+        return jsonify({'error': 'Invalid Input Format'}), 400
+
 def plot_points(points, title):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
