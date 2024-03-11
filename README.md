@@ -15,10 +15,10 @@ Type `ip:port` into browser, or CTRL + ‘click’ `http://ip:port`
 7. Begin to utilize the implemented functions below.
 
 ## Precision:
-1. There are two options. An input and output precision. They are independent from each other.
+1. There are two options, an input and output precision. They are independent from each other.
 2. Input any integer into the box, or boxes.
 3. Press the "Set xxx Precision" button.
-4. Your significant figure are now set.
+4. Your significant figures are now set and can be changed again at any time.
 
 ## Smallest Bounding Box:
 1. Put in an array of points in the following format (copy and paste the cell to see a sample run):
@@ -113,9 +113,8 @@ Type `ip:port` into browser, or CTRL + ‘click’ `http://ip:port`
 | ------ | ----- | ----- |
 |    4   |   4   |   4   |
 
-3. Select the axis in which you want the mesh rotated from the drop down menu (sample done with X).
-4. Press the “Scale” button.
-5. The output will be the new coordinates of the mesh after scaling:
+3. Press the “Scale” button.
+4. The output will be the new coordinates of the mesh after scaling:
    
 `{"scaled_mesh":[[4,8,12],[16,20,24],[28,32,36]]}`
 
@@ -174,7 +173,7 @@ python3 3D_Geometry_Testing.py
 * `ThreeD_geometry_with_Plotting.py` can be disregarded. It does work and will output a 3D plot with points, but it's not where I want it to be. It also has the beginnings of scalar, shear, reflection, and rotate/move simultaneously.
 * `index_with_plotting_precision.html` can also be disregarded for the time being. This handles the aforementioned plotting and also has the beginnings of adjustable precision (I made the assumption it was referencing significant figures).
 * I have made the Docker container as streamlined as possible. The one thing that I was unable to do was open a web browser from inside of a Docker container. I tried everything I could find documentation wise and various tips & tricks, but it seems a genuine limitation of Docker.
-* I actually found an error in [geeksforgeeks](https://www.geeksforgeeks.org/computer-graphics-3d-shearing-transformation/) math for the end sheared function as their B point is 8,10,2, but the math and my program gave me 4,10,2
+* I actually found an error in [geeksforgeeks](https://www.geeksforgeeks.org/computer-graphics-3d-shearing-transformation/) math for the end sheared function as their B point is 8,10,2, but the math and my program gave me 4,10,2.
 
 (Admin level. Jump to run for relevant information)
 Setup Steps:
