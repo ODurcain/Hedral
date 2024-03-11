@@ -1,5 +1,8 @@
-import unittest
-from ThreeD_Geometry import calc_bounding_box, rotate_mesh_logic, move_mesh_logic, is_convex_logic
+import unittest, os, sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+from main.ThreeD_Geometry import calc_bounding_box, rotate_mesh_logic, move_mesh_logic, is_convex_logic
 
 class TestBoundingBox(unittest.TestCase):
     def test_calc_bounding_box_with_points(self):
