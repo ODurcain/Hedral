@@ -10,10 +10,33 @@ from math import cos, sin, radians, sqrt, pi, acos
 
 app=Flask(__name__, template_folder='../../templates')
 
+input_precision = 2
+output_precision = 6
+
 # I didn't know this was a hard requirement for Flask and I was stuck for an hour with a 404 error
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/set_input_precision', methods=['POST'])
+def set_input_precision():
+    global input_precision
+    try:
+        data = request.get_json()
+        input_precision = int(data.get('inputPrecision'))
+        return jsonify({'inputPrecision': input_precision, 'message': f'Input Precision set to {input_precision}'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/set_output_precision', methods=['POST'])
+def set_output_precision():
+    global output_precision
+    try:
+        data = request.get_json()
+        output_precision = int(data.get('outputPrecision'))
+        return jsonify({'outputPrecision': output_precision, 'message': f'Output Precision set to {output_precision}'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 # smallest box logic
 def calc_bounding_box(points: List[Tuple[float,float,float]]) -> Tuple[Tuple[float,float,float], Tuple[float,float,float]]:
@@ -85,7 +108,7 @@ def rotate_mesh_logic(mesh: List[Tuple[float,float,float]],
     rotated_mesh=[]
     for point in mesh:
         rotated_point=np.dot(rotation_matrix, point)
-        rotated_mesh.append(tuple(rotated_point))
+        rotated_mesh.append(tuple(rotated_point.round(output_precision)))
 
     return rotated_mesh
         
@@ -108,7 +131,9 @@ def move_mesh_logic(points: List[Tuple[float,float,float]],
         return None
     moved_mesh=[]
     for point in points:
-        moved_point=(point[0]+x, point[1]+y, point[2]+z)
+        moved_point=(round(point[0]+x, output_precision), 
+                     round(point[1]+y, output_precision), 
+                     round(point[2]+z, output_precision))
         moved_mesh.append(moved_point)
     return moved_mesh
 
@@ -184,7 +209,7 @@ def scale_mesh_logic(points: List[Tuple[float,float,float]],
     if not points or x is None or y is None or z is None:
         return None
     
-    # going to update later for precision. will most likely be a global variable
+    # going to update later for output_precision. will most likely be a global variable
     epsilon=0.0001
 
     x= 1 if abs(x) < epsilon else x
@@ -193,9 +218,9 @@ def scale_mesh_logic(points: List[Tuple[float,float,float]],
     
     scaled_mesh = []
     for point in points:
-        scaled_point = (point[0] * (x if point[0]==max(p[0] for p in points) else 1),
-                        point[1] * (y if point[0]==max(p[1] for p in points) else 1), 
-                        point[2] * (z if point[0]==max(p[2] for p in points) else 1))
+        scaled_point = (round(point[0] * (x if point[0]==max(p[0] for p in points) else 1), output_precision),
+                        round(point[1] * (y if point[0]==max(p[1] for p in points) else 1), output_precision), 
+                        round(point[2] * (z if point[0]==max(p[2] for p in points) else 1), output_precision))
         scaled_mesh.append(scaled_point)
     
     return scaled_mesh
@@ -242,7 +267,7 @@ def reflect_mesh_logic(points: List[Tuple[float,float,float]],
     reflected_matrix = []
     for point in points:
         transformed_point = np.dot(reflect_matrix, point) 
-        reflected_matrix.append(tuple(transformed_point.tolist()))
+        reflected_matrix.append(tuple(transformed_point.round(output_precision).tolist()))
 
     return reflected_matrix
 
@@ -298,7 +323,7 @@ def shear_mesh_logic(points: List[Tuple[float,float,float]],
     sheared_mesh=[]
     for point in points:
         transformed_point = np.dot(shear_matrix, point)
-        sheared_mesh.append(transformed_point.tolist())
+        sheared_mesh.append(tuple(transformed_point.round(output_precision).tolist()))
 
     return sheared_mesh
 

@@ -7,6 +7,24 @@
 {% block body %}
 <h1>Geometric Calculator</h1>
 
+    <h2>Set Input Precision</h2>
+    <form id="setInputPrecision">
+        <label for="inputPrecision">Input Precision (integer) sets the step value for input fields (max is 18):</label><br>
+        <input type="number" id="inputPrecision" name="inputPrecision" min="0" required><br>
+        <button type="submit">Set Input Precision</button>
+    </form>
+
+    <div id="setInputPrecisionValue"></div>
+
+    <h2>Set Output Precision</h2>
+    <form id="setOutputPrecision">
+        <label for="outputPrecision">Output Precision (integer) sets the number of significant figures (max is 18):</label><br>
+        <input type="number" id="outputPrecision" name="outputPrecision" min="0" required><br>
+        <button type="submit">Set Output Precision</button>
+    </form>
+
+    <div id="setOutputPrecisionValue"></div>
+
     <h2>Calculate Smallest Bounding Box</h2>
     <form id="boundingBoxForm">
         <label for="points">3D Points (comma separated x,y,z):</label><br>
@@ -19,7 +37,7 @@
     <form id="rotateMeshForm">
         <label for="rotateMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="rotateMesh" name="rotateMesh" rows="4" cols="50"></textarea><br>
-        <label for="angle">Angle (x.xx):</label>
+        <label for="angle">Angle (x.(precision value)):</label>
         <input type="number" id="angle" name="angle" min="0" step="0.01" requried><br>
         <label for="axis">Axis:</label>
         <select id="axis" name="axis" required>
@@ -38,13 +56,13 @@
     <form id="moveMeshForm">
         <label for="moveMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="moveMesh" name="moveMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirectionMove">X-Direction (x.xx):</label>
+        <label for="xDirectionMove">X-Direction (x.(precision value)):</label>
     <!-- I want to note that this probably isn't the best way as 
         you have to adjust 'step' depending accuracy desired -->
         <input type="number" id="xDirectionMove" name="xDirectionMove" step="0.01" required><br>
-        <label for="yDirectionMove">Y-Direction (x.xx):</label>
+        <label for="yDirectionMove">Y-Direction (x.(precision value)):</label>
         <input type="number" id="yDirectionMove" name="yDirectionMove" step="0.01" required><br>
-        <label for="xDirectionMove">Z-Direction (x.xx):</label>
+        <label for="xDirectionMove">Z-Direction (x.(precision value)):</label>
         <input type="number" id="zDirectionMove" name="zDirectionMove" step="0.01" required><br>
         <button type="submit">Move</button>
     </form>
@@ -63,11 +81,11 @@
     <form id="scaleMeshForm">
         <label for="scaleMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="scaleMesh" name="scaleMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirectionScale">X-Direction (x.xx):</label>
+        <label for="xDirectionScale">X-Direction (x.(precision value)):</label>
         <input type="number" id="xDirectionScale" name="xDirectionScale" step="0.01" required><br>
-        <label for="yDirectionScale">Y-Direction (x.xx):</label>
+        <label for="yDirectionScale">Y-Direction (x.(precision value)):</label>
         <input type="number" id="yDirectionScale" name="yDirectionScale" step="0.01" required><br>
-        <label for="xDirectionScale">Z-Direction (x.xx):</label>
+        <label for="xDirectionScale">Z-Direction (x.(precision value)):</label>
         <input type="number" id="zDirectionScale" name="zDirectionScale" step="0.01" required><br>
         <button type="submit">Scale</button>
     </form>
@@ -93,11 +111,11 @@
     <form id="shearMeshForm">
         <label for="shearMesh">Mesh (comma separated x,y,z):</label><br>
         <textarea id="shearMesh" name="shearMesh" rows="4" cols="50"></textarea><br>
-        <label for="xDirectionShear">X-Direction (x.xx):</label>
+        <label for="xDirectionShear">X-Direction (x.(precision value)):</label>
         <input type="number" id="xDirectionShear" name="xDirectionShear" step="0.01" required><br>
-        <label for="yDirectionShear">Y-Direction (x.xx):</label>
+        <label for="yDirectionShear">Y-Direction (x.(precision value)):</label>
         <input type="number" id="yDirectionShear" name="yDirectionShear" step="0.01" required><br>
-        <label for="zDirectionShear">Z-Direction (x.xx):</label>
+        <label for="zDirectionShear">Z-Direction (x.(precision value)):</label>
         <input type="number" id="zDirectionShear" name="zDirectionShear" step="0.01" required><br>
         <label for="axisShear">Axis:</label>
         <select id="axisShear" name="axisShear" required>
@@ -132,6 +150,56 @@
                 return { error: 'An error occurred' };
             }
         }
+
+        // Event handler for input precision
+        document.getElementById('setInputPrecision').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const inputPrecisionInput = document.getElementById('inputPrecision');
+            const inputPrecisionValue = parseInt(inputPrecisionInput.value);
+            
+            const response = await fetch('/set_input_precision', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ inputPrecision: inputPrecisionValue })
+            });
+
+            const data = await response.json();
+            const inputPrecision = data.inputPrecision;
+            
+            // Update all input fields with the new step value
+            const inputFields = document.querySelectorAll('input[type="number"]');
+            inputFields.forEach(input => {
+                input.setAttribute('step', '0.' + '0'.repeat(inputPrecision - 1) + '1');
+            });
+            
+            const messageContainer = document.getElementById('setInputPrecisionValue');
+            messageContainer.textContent = 'Input Precision set to ' + inputPrecision;
+        });
+
+        // Event handler for output precision
+        document.getElementById('setOutputPrecision').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const outputPrecisionInput = document.getElementById('outputPrecision');
+            const outputPrecisionValue = parseInt(outputPrecisionInput.value);
+            
+            const response = await fetch('/set_output_precision', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ outputPrecision: outputPrecisionValue })
+            });
+
+            const data = await response.json();
+            const outputPrecision = data.outputPrecision;
+            
+            const messageContainer = document.getElementById('setOutputPrecisionValue');
+            messageContainer.textContent = 'Output Precision set to ' + outputPrecision;
+        });
 
         // Event listener for bounding box form submission
         document.getElementById('boundingBoxForm').addEventListener('submit', async function (event) {
