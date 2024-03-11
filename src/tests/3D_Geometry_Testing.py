@@ -2,7 +2,9 @@ import unittest, os, sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-from main.ThreeD_Geometry import calc_bounding_box, rotate_mesh_logic, move_mesh_logic, is_convex_logic
+from main.ThreeD_Geometry import (calc_bounding_box, rotate_mesh_logic, 
+                                  move_mesh_logic, is_convex_logic, 
+                                  scale_mesh_logic,reflect_mesh_logic,shear_mesh_logic)
 
 class TestBoundingBox(unittest.TestCase):
     def test_calc_bounding_box_with_points(self):
@@ -241,6 +243,190 @@ class TestIsConvex(unittest.TestCase):
         # Test with empty points
         empty_points = []
         self.assertIsNone(is_convex_logic(empty_points))
+
+class TestScale(unittest.TestCase):
+    def test_scale_all_coordinates(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test scaling where all x, y, z factors are non-zero
+        scaled_mesh = scale_mesh_logic(points, 2.0, 0.5, 3.0)
+        
+        # Expected result after scaling
+        expected_result = [(2.0, 1.0, 9.0), (8.0, 2.5, 18.0), (14.0, 4.0, 27.0)]
+        
+        # Compare the scaled mesh with the expected result
+        self.assertEqual(scaled_mesh, expected_result)
+
+    def test_scale_with_zero_factors(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test scaling where one or more factors are zero
+        scaled_mesh = scale_mesh_logic(points, 0.0, 1.0, 3.0)
+        
+        # Expected result after scaling
+        expected_result = [(0.0, 2.0, 9.0), (0.0, 5.0, 18.0), (0.0, 8.0, 27.0)]
+        
+        # Compare the scaled mesh with the expected result
+        self.assertEqual(scaled_mesh, expected_result)
+
+    def test_empty_input(self):
+        # Test with empty input
+        scaled_mesh = scale_mesh_logic([], 2.0, 0.5, 3.0)
+        
+        # Expected result should be None
+        self.assertIsNone(scaled_mesh)
+
+class TestReflect(unittest.TestCase):
+    def test_reflect_xy(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test reflection about the XY plane
+        reflected_mesh = reflect_mesh_logic(points, 'XY')
+        
+        # Expected result after reflection
+        expected_result = [(1.0, 2.0, -3.0), (4.0, 5.0, -6.0), (7.0, 8.0, -9.0)]
+        
+        # Compare the reflected mesh with the expected result
+        self.assertEqual(reflected_mesh, expected_result)
+
+    def test_reflect_xz(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test reflection about the XZ plane
+        reflected_mesh = reflect_mesh_logic(points, 'XZ')
+        
+        # Expected result after reflection
+        expected_result = [(1.0, -2.0, 3.0), (4.0, -5.0, 6.0), (7.0, -8.0, 9.0)]
+        
+        # Compare the reflected mesh with the expected result
+        self.assertEqual(reflected_mesh, expected_result)
+
+    def test_reflect_yz(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test reflection about the YZ plane
+        reflected_mesh = reflect_mesh_logic(points, 'YZ')
+        
+        # Expected result after reflection
+        expected_result = [(-1.0, 2.0, 3.0), (-4.0, 5.0, 6.0), (-7.0, 8.0, 9.0)]
+        
+        # Compare the reflected mesh with the expected result
+        self.assertEqual(reflected_mesh, expected_result)
+
+    def test_invalid_axis(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test reflection with an invalid axis
+        with self.assertRaises(ValueError):
+            reflect_mesh_logic(points, 'XYZ')
+
+    def test_empty_input(self):
+        # Test with empty input
+        reflected_mesh = reflect_mesh_logic([], 'XY')
+        
+        # Expected result should be None
+        self.assertIsNone(reflected_mesh)
+
+# shear logic is weird 
+class TestShear(unittest.TestCase):
+    def test_shear_x(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing along the X-axis
+        sheared_mesh = shear_mesh_logic(points, 3, 2, 8, 'X')
+        
+        # Expected result after shearing along X-axis
+        expected_result = [(1,4,11), (4,13,38), (7,22,65)]  # Updated
+        
+        # Compare the sheared mesh with the expected result
+        self.assertEqual(sheared_mesh, expected_result)
+
+    def test_shear_y(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing along the Y-axis
+        sheared_mesh = shear_mesh_logic(points, 3, 2, 8, 'Y')
+        
+        # Expected result after shearing along Y-axis
+        expected_result = [(7,2,19), (19,5,46), (31,8,73)]  # Updated
+        
+        # Compare the sheared mesh with the expected result
+        self.assertEqual(sheared_mesh, expected_result)
+
+    def test_shear_z(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing along the Z-axis
+        sheared_mesh = shear_mesh_logic(points, 3, 2, 8, 'Z')
+        
+        # Expected result after shearing along Z-axis
+        expected_result = [(10,8,3), (22,17,6), (34,26,9)]  # Updated
+        
+        # Compare the sheared mesh with the expected result
+        self.assertEqual(sheared_mesh, expected_result)
+
+    def test_shear_xy(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing along the XY-plane
+        sheared_mesh = shear_mesh_logic(points, 3, 2, 8, 'XY')
+        
+        # Expected result after shearing along XY-plane
+        expected_result = [(7,16,75), (19,43,198), (31,70,321)]  # Updated
+        
+        # Compare the sheared mesh with the expected result
+        self.assertEqual(sheared_mesh, expected_result)
+
+    def test_shear_xz(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing along the XZ-plane
+        sheared_mesh = shear_mesh_logic(points, 3, 2, 8, 'XZ')
+        
+        # Expected result after shearing along XZ-plane
+        expected_result = [(10,28,83), (22,61,182), (34,94,281)]  # Updated
+        
+        # Compare the sheared mesh with the expected result
+        self.assertEqual(sheared_mesh, expected_result)
+
+    def test_shear_yz(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing along the YZ-plane
+        sheared_mesh = shear_mesh_logic(points, 3, 2, 8, 'YZ')
+        
+        # Expected result after shearing along YZ-plane
+        expected_result = [(34,8,67), (73,17,142), (112,26,217)]  # Updated
+        
+        # Compare the sheared mesh with the expected result
+        self.assertEqual(sheared_mesh, expected_result)
+
+    def test_invalid_axis(self):
+        # Define some test points
+        points = [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)]
+        
+        # Test shearing with an invalid axis
+        with self.assertRaises(ValueError):
+            shear_mesh_logic(points, 0.5, 0.5, 0.0, 'XYZ')
+
+    def test_empty_input(self):
+        # Test with empty input
+        sheared_mesh = shear_mesh_logic([], 0.5, 0.5, 0.0, 'XY')
+        
+        # Expected result should be None
+        self.assertIsNone(sheared_mesh)
 
 if __name__ == '__main__':
     unittest.main()

@@ -209,18 +209,11 @@ def scale_mesh_logic(points: List[Tuple[float,float,float]],
     if not points or x is None or y is None or z is None:
         return None
     
-    # going to update later for output_precision. will most likely be a global variable
-    epsilon=0.0001
-
-    x= 1 if abs(x) < epsilon else x
-    y= 1 if abs(y) < epsilon else y
-    z= 1 if abs(z) < epsilon else z
-    
     scaled_mesh = []
     for point in points:
-        scaled_point = (round(point[0] * (x if point[0]==max(p[0] for p in points) else 1), output_precision),
-                        round(point[1] * (y if point[0]==max(p[1] for p in points) else 1), output_precision), 
-                        round(point[2] * (z if point[0]==max(p[2] for p in points) else 1), output_precision))
+        scaled_point = (round(point[0] * x, output_precision),
+                        round(point[1] * y, output_precision),
+                        round(point[2] * z, output_precision))
         scaled_mesh.append(scaled_point)
     
     return scaled_mesh
@@ -288,12 +281,12 @@ def shear_mesh_logic(points: List[Tuple[float,float,float]],
     if not points:
         return None
     
-    x_shear_matrix=np.array([[1,y,z],
+    x_shear_matrix=np.array([[1,0,0],
+                              [y,1,0],
+                              [z,0,1]])
+    y_shear_matrix=np.array([[1,x,0],
                               [0,1,0],
-                              [0,0,1]])
-    y_shear_matrix=np.array([[1,0,0],
-                              [x,1,z],
-                              [0,0,1]])
+                              [0,z,1]])
     z_shear_matrix=np.array([[1,0,x],
                               [0,1,y],
                               [0,0,1]])
