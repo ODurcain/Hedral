@@ -1,6 +1,6 @@
 ##
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template #, redirect, url_for
 import numpy as np
 # For bounding box
 from typing import List, Tuple
@@ -8,12 +8,25 @@ from typing import List, Tuple
 from math import cos, sin, radians, sqrt, pi, acos
 # specifically for plotting 
 import matplotlib.pyplot as plt
+# from flask_dance.contrib.github import make_github_blueprint, github
+
 
 app=Flask(__name__)
+# app.secret_key="secretkey"
+
+# github_bp=make_github_blueprint(
+#     client_id="160578b827ba29a0f36c",
+#     client_secret="b3e2f665e263525b905b6faf7d1f0eda5ba49dd4",
+# )
+# app.register_blueprint(github_bp, url_prefix="/login")
 
 # I didn't know this was a hard requirement for Flask and I was stuck for an hour with a 404 error
 @app.route('/')
 def index():
+    # if not github.authorized:
+    #     return redirect(url_for('github.login'))
+    # resp = github.get('/user')
+    # assert resp.ok, resp.text
     return render_template('index.html')
 
 def calc_precision(precision_value: int) -> str:

@@ -10,6 +10,7 @@ from math import cos, sin, radians, sqrt, pi, acos
 
 app=Flask(__name__, template_folder='../../templates')
 
+# standards when none is set by user
 input_precision = 2
 output_precision = 6
 

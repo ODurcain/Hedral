@@ -1,5 +1,7 @@
 Flask
 Flask-sqlalchemy
+Flask-dance
 matplotlib
 scipy
 numpy
+ngrok
