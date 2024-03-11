@@ -5,23 +5,11 @@ Jump to bottom for some development notes.
 ## Run:
 1. Clone the repo to a directory of your choice https://github.com/ODurcain/Hedral/ 
 2. Navigate to ../Hedral directory. 
-3. Open terminal and run one of the following depending OS
-   * Windows:
-     ```
-     hedral_env\Scripts\activate
-     ```
-   * Mac/Linux:
-     ```
-     source hedral_env/bin/activate
-     ```
-4. A few installs as needed (these get installed in the flask container. If the are globally installed thai can be skipped):
+3. run 
 ```
-pip install Flask Flask-sqlalchemy
-pip install matplotlib
-pip install scipy
-pip install numpy
+docker-compose build
+docker-compose up
 ```
-5. In terminal window while inside the hedral_env: python3 ThreeD_Geometry.py
 6. Checking Running on `ip:port` (Assume `ip:port` = `localhost:5000`, but may be machine dependant)
 Type `ip:port` into browser, or CTRL + ‘click’ `http://ip:port`
 7. Begin to utilize the implemented functions below.
@@ -123,6 +111,8 @@ python3 3D_Geometry_Testing.py
 * Move mesh and bounding box were straightforward with NumPy library and basic arithmetic operations.
 * `ThreeD_geometry_with_Plotting.py` can be disregarded. It does work and will output a 3D plot with points, but it's not where I want it to be. It also has the beginnings of scalar, shear, reflection, and rotate/move simultaneously.
 * `index_with_plotting_precision.html` can also be disregarded for the time being. This handles the aforementioned plotting and also has the beginnings of adjustable precision (I made the assumption it was referencing significant figures).
+* I have made the Docker container as streamlined as possible. The one thing that I was unable to do was open a web browser from inside of a Docker container. I tried everything I could find documentation wise and various tips & tricks, but it seems a genuine limitation of Docker.
+* I actually found an error in [geeksforgeeks](https://www.geeksforgeeks.org/computer-graphics-3d-shearing-transformation/) math for the end sheared function as their B point is 8,10,2, but the math and my program gave me 4,10,2
 
 (Admin level. Jump to run for relevant information)
 Setup Steps:
